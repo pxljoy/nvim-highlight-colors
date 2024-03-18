@@ -12,7 +12,7 @@ function M.get_color_value(color, row_offset, custom_colors)
 	end
 
 	if patterns.is_alpha_layer_hex_0x(color) then
-		return string.sub(color, 1, 8):gsub("0x", "#")
+		return "#" .. string.sub(color, 5, 10)
 	end
 
 	if patterns.is_alpha_layer_hex(color) then

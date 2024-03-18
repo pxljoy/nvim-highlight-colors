@@ -44,7 +44,7 @@ function M.create_highlight(
 )
 	local highlight_group = create_highlight_name(color)
 	local color_value = colors.get_color_value(color, 2, custom_colors)
-	print(color_value, color, highlight_group)
+
 	if color_value == nil then
 		return
 	end
