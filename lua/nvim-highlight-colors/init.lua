@@ -1,5 +1,4 @@
 local utils = require("nvim-highlight-colors.utils")
-local table_utils = require("nvim-highlight-colors.table_utils")
 local buffer_utils = require("nvim-highlight-colors.buffer_utils")
 local colors = require("nvim-highlight-colors.color.utils")
 local color_patterns = require("nvim-highlight-colors.color.patterns")
@@ -25,7 +24,7 @@ local M = {}
 
 function M.setup(user_options)
 	is_loaded = true
-	if (user_options ~= nil and user_options ~= {}) then
+	if user_options ~= nil and user_options ~= {} then
 		for key, _ in pairs(user_options) do
 			if user_options[key] ~= nil then
 				options[key] = user_options[key]
@@ -44,26 +43,20 @@ function M.highlight_colors(min_row, max_row, active_buffer_id)
 	}
 
 	if options.enable_named_colors then
-	       table.insert(patterns, colors.get_css_named_color_pattern())
+		table.insert(patterns, colors.get_css_named_color_pattern())
 	end
 
 	if options.enable_tailwind then
-	       table.insert(patterns, colors.get_tailwind_named_color_pattern())
+		table.insert(patterns, colors.get_tailwind_named_color_pattern())
 	end
 
-	if (options.custom_colors ~= nil) then
+	if options.custom_colors ~= nil then
 		for _, custom_color in pairs(options.custom_colors) do
 			table.insert(patterns, custom_color.label)
 		end
 	end
 
-	local positions = buffer_utils.get_positions_by_regex(
-		patterns,
-		min_row - 1,
-		max_row,
-		active_buffer_id,
-		row_offset
-	)
+	local positions = buffer_utils.get_positions_by_regex(patterns, min_row - 1, max_row, active_buffer_id, row_offset)
 
 	for _, data in pairs(positions) do
 		utils.create_highlight(
@@ -119,7 +112,7 @@ function M.clear_highlights(active_buffer_id)
 	if #virtual_texts then
 		for _, virtual_text in pairs(virtual_texts) do
 			local extmart_id = virtual_text[1]
-			if (tonumber(extmart_id) ~= nil) then
+			if tonumber(extmart_id) ~= nil then
 				vim.api.nvim_buf_del_extmark(buffer_id, ns_id, extmart_id)
 			end
 		end
@@ -140,37 +133,34 @@ function M.handle_autocmd_callback(props)
 	end
 end
 
-vim.api.nvim_create_autocmd({"TextChanged", "TextChangedI", "TextChangedP", "VimResized"}, {
+vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "TextChangedP", "VimResized" }, {
 	callback = M.handle_autocmd_callback,
 })
 
-vim.api.nvim_create_autocmd({"WinScrolled"}, {
+vim.api.nvim_create_autocmd({ "WinScrolled" }, {
 	callback = M.handle_autocmd_callback,
 })
 
-vim.api.nvim_create_autocmd({"BufEnter"}, {
+vim.api.nvim_create_autocmd({ "BufEnter" }, {
 	callback = M.handle_autocmd_callback,
 })
 
-vim.api.nvim_create_user_command("HighlightColors",
-	function(opts)
-		local arg = string.lower(opts.fargs[1])
-		if arg == "on" then
-			M.turn_on()
-		elseif arg == "off" then
-			M.turn_off()
-		elseif arg == "toggle" then
-			M.toggle()
-		end
+vim.api.nvim_create_user_command("HighlightColors", function(opts)
+	local arg = string.lower(opts.fargs[1])
+	if arg == "on" then
+		M.turn_on()
+	elseif arg == "off" then
+		M.turn_off()
+	elseif arg == "toggle" then
+		M.toggle()
+	end
+end, {
+	nargs = 1,
+	complete = function()
+		return { "On", "Off", "Toggle" }
 	end,
-	{
-		nargs = 1,
-		complete = function()
-			return { "On", "Off", "Toggle" }
-		end,
-		desc = "Config color highlight"
-	}
-)
+	desc = "Config color highlight",
+})
 
 utils.deprecate()
 

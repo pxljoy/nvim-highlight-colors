@@ -3,8 +3,9 @@ local M = {}
 M.rgb_regex = "rgba?[(]+" .. string.rep("%s*%d+%s*", 3, "[,%s]") .. "[,%s/]?%s*%d*%.?%d*%%?%s*[)]+"
 M.hex_regex = "#%x%x%x+%f[^%w_]"
 M.hex_0x_regex = "%f[%w_]0x%x%x%x+%f[^%w_]"
-M.hsl_regex = "hsla?[(]+" .. string.rep("%s*%d?%.?%d+%%?d?e?g?t?u?r?n?%s*", 3, "[,%s]") .. "[%s,/]?%s*%d*%.?%d*%%?%s*[)]+"
-
+M.hsl_regex = "hsla?[(]+"
+	.. string.rep("%s*%d?%.?%d+%%?d?e?g?t?u?r?n?%s*", 3, "[,%s]")
+	.. "[%s,/]?%s*%d*%.?%d*%%?%s*[)]+"
 M.var_regex = "%-%-[%d%a-_]+"
 M.var_declaration_regex = M.var_regex .. ":%s*" .. M.hex_regex
 M.var_usage_regex = "var%(" .. M.var_regex .. "%)"
@@ -21,6 +22,10 @@ end
 
 function M.is_alpha_layer_hex(color)
 	return string.match(color, M.hex_regex) ~= nil and string.len(color) == 9
+end
+
+function M.is_alpha_layer_hex_0x(color)
+	return string.match(color, M.hex_0x_regex) ~= nil and string.len(color) == 10
 end
 
 function M.is_rgb_color(color)
